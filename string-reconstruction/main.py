@@ -6,10 +6,10 @@
 # 4. Takes a eulerian path and turns it into a genome
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-from Graph import Graph
+from graph import Graph
 
 # Path to adjacency list
-input_file = "/Users/jameswengler/Downloads/dataset_577139_6.txt"
+input_file = "test_input.txt"
 
 test_graph = Graph(input_file)
 

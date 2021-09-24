@@ -1,4 +1,6 @@
-from Node import Node
+from node import Node
+
+
 class Graph:
 
     # Path must be to adjacency list in format of
@@ -9,45 +11,43 @@ class Graph:
     #       etc.
     def __init__(self, in_file):
         self.in_file = in_file
+        self.k = 0  # This is the k in k-mer. Might make some code easier to read. Use it if you need.
         self.nodes = []
-        self.e_path = [] # FIXME -> What's the best way to store this?
-    
-
-    def get_start(self, adjacency):
-        return adjacency.split("->")[0]
-
-    def get_ends(self, adjacency):
-        return adjacency.split("->")[1].split(",")
+        self.e_path = []  # FIXME -> What's the best way to store this?
+        # A linked list implementation? It's a hassle, but has a lower complexity. Whatever is easiest to work on. -Alex
 
     # This populates the nodes list with node objects
-    # I think this needs to be reworked so that it takes in patterns and not an adjacency list 
     def make_db_graph(self):
+        # In file format:
+        # <k>
+        # <lines of reads of k length>
         with open(self.in_file, "r+") as input_file:
-            adjacencies = input_file.readlines()
+            self.k = int(input_file.readline())
+            reads = []
 
-            # Remove whitespace
-            for i in range(len(adjacencies)):
-                adjacencies[i] = ''.join(adjacencies[i].split())
+            # Remove whitespace, ignore empty lines
+            for line in input_file.readlines():
+                line = ''.join(line.split())
+                if line != '':
+                    assert len(line) == self.k
+                    reads.append(line)
 
             # Create and populate adjacency list
             # Key = "AGG"
             # Value = ["GGA", "GGT"]
             adjacency_list = {}
-            for adjacency in adjacencies:
-                start_node = self.get_start(adjacency)
-                end_nodes = self.get_ends(adjacency)
-                adjacency_list[start_node] = end_nodes
-
-            edge_count = 0
-            for connection_list in adjacency_list.values():
-                edge_count += len(connection_list)
+            for read in reads:
+                prefix = read[0:-1]
+                suffix = read[1:]
+                if prefix not in adjacency_list:
+                    adjacency_list[prefix] = []  # If we don't have a node stored yet, create one!
+                adjacency_list[prefix].append(suffix)  # Place the next node in the adjacency list
 
             # Create initial list of nodes from above adjacency list
             for seq, con in adjacency_list.items():
                 new_node = Node(seq, con)
                 self.nodes.append(new_node)
 
-        
     def print_nodes(self):
         # Test function to make sure the nodes are being created properly
         for node in self.nodes:
@@ -65,20 +65,13 @@ class Graph:
 
     def eularian_to_string(self):
         print("FIXME")
-    
+
     def check_if_all_nodes_visited(self):
         print("FIXME")
-    
+
     def get_node_from_sequence(self, node_sequence):
         temp_node = Node("NA", "NA")
         for node in self.nodes:
             if node.get_sequence == node_sequence:
                 temp_node = node
         return temp_node
-        
-
-
-
-
-
-    

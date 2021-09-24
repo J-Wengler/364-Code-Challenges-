@@ -8,7 +8,7 @@ class Node:
         self.connections = connections 
         self.been_visited = False
 
-    def been_visited(self):
+    def been_visited(self):  # TODO: Switch to meaning every node has been visited. -Alex
         return self.been_visited
 
     def get_connections(self):
