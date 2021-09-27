@@ -14,5 +14,6 @@ input_file = "test_input.txt"
 test_graph = Graph(input_file)
 
 test_graph.make_db_graph()
-test_graph.print_nodes()
+test_graph.get_eulerian_path()
+test_graph.eulerian_to_string()
 
