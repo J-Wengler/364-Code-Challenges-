@@ -150,7 +150,8 @@ class Graph:
                 sequence += node.get_sequence()
             else:
                 sequence += node.get_sequence()[-1]
-        print(sequence)
+        with open("output.txt", "w+") as out_file:
+            out_file.write(sequence)
 
     def print_nodes(self):
         # Test function to make sure the nodes are being created properly

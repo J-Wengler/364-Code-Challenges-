@@ -1,4 +1,7 @@
+from os import remove
 from buildtreefromfile import buildtreefromfile
+from buildtreefromfile import build_unrooted_tree
+from node import Node
 
 
 # Gets the best, lowest-parsimony score possible for a given parent (ripe_node) to
@@ -12,6 +15,7 @@ def get_min_score(ripe_node, k, character):
 
     return min_value_left + min_value_right
 
+#def assign_node_unrooted_Tree(T):
 
 # Returns the best letter and the value that allows you to get to parent k
 # Order of keys in character is tiebreaker
@@ -31,6 +35,49 @@ def get_min_key_value(node, k, character):
             min_value = val
             min_key = key
     return min_key, min_value
+
+def add_root_to_unrooted_tree(T):
+    paired_node_one = None
+    paired_node_one_num = -1
+    paired_node_two = None
+    paired_node_two_num = -1
+    for node in T.T.values():
+        if len(node.children) == 3:
+            if paired_node_one is None:
+                paired_node_one = node
+                paired_node_one_num = node.num
+            else:
+                paired_node_two = node
+                paired_node_two_num = node.num
+    root = Node(len(T.T.values()))
+    paired_node_one.remove_child(paired_node_two_num)
+    paired_node_two.remove_child(paired_node_one_num)
+    paired_node_one.parent = root
+    paired_node_two.parent = root
+    root.children.append(paired_node_one)
+    root.children.append(paired_node_two)
+    T.T[len(T.T.values())] = root
+    return T
+
+# def remove_root(T):
+#     root_node = None
+#     root_num = -1
+#     left_root_child = None
+#     right_root_child = None
+#     for node in T.T.values():
+#         if node.parent == None:
+#             root_node = node
+#             root_num = node.num
+#             left_root_child = node.children[0]
+#             right_root_child = node.children[1]
+#     del T.T[root_num]
+#     #left_root_child.parent = right_root_child
+#     #left_root_child.children.append(right_root_child)
+#     #right_root_child.parent = None
+#     #right_root_child.children.append(left_root_child)
+#     return T
+
+
 
 
 # Recursively updates the label for nodes by appending the best guess stored in the sk values
@@ -93,6 +140,7 @@ def small_parsimony(T, character):
             ripe_node = T.get_ripe_node()
 
         # Use scores to get inner-node nucleotide
+        
         update_labels(root, character)
 
 
@@ -113,9 +161,23 @@ input_file_path = "/Users/jameswengler/BIO 364/364-Code-Challenges-/small-parsim
 output_file_path = "/Users/jameswengler/BIO 364/364-Code-Challenges-/small-parsimony/output.txt"
 character = ['A', 'C', 'G', 'T']
 
-T = buildtreefromfile(input_file_path)
-small_parsimony(T, character)
-# print(T)
+# T = buildtreefromfile(input_file_path)
+# small_parsimony(T, character)
+# # print(T)
 
-print("Parsimony score is:", T.get_parsimony_score())
-save_output(output_file_path, T)
+# print("Parsimony score is:", T.get_parsimony_score())
+# save_output(output_file_path, T)
+
+##### Unrooted Tree Code Below #####
+
+T = build_unrooted_tree(input_file_path)
+T = add_root_to_unrooted_tree(T)
+
+
+print(T)
+
+#small_parsimony(T, character)
+
+
+#save_output(output_file_path, T)
+
