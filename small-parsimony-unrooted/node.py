@@ -3,9 +3,10 @@ class Node:
         self.children = [] # List of Nodes
         self.parent = None # Node
         self.num = num # number node name
-        self.label = "" # i.e. agctca
+        self.label = num # i.e. agctca
         self.sk = dict.fromkeys(['A', 'C', 'G', 'T']) # indexes are acgt
         self.tag = None
+        self.links = []
         self.distance_to_parent = 0  # The substitutions required to turn child to parent i.e. AGG->TGG=1
 
     def __repr__(self):
@@ -18,13 +19,24 @@ class Node:
             parent_num = self.parent.num
         if self.tag is not None:
             tag = self.tag
-        children_nums = [child.num for child in self.children]
-        return str(self.num) + ':' + label + '\n' \
-            + 'children:' + children_nums.__repr__() + '\n' \
-            + 'parent:' + str(parent_num) + '\n' \
-            + 'dist to self:' + str(self.distance_to_parent) + '\n' \
-            + 'sk:' + self.sk.__repr__() + '\n' \
-            + 'tag:' + str(tag) + '\n'
+        children_nums = [child.num for child in self.links]
+        child_str = ""
+        if len(self.children) == 0:
+            child_str = "Empty"
+        else:
+            for child in self.children:
+                child_str += f"{child.num} "
+        parent_str = ""
+        if self.parent == None:
+            parent_str = "None"
+        else:
+            parent_str = f"{self.parent.num}"
+        link_str = ""
+        for link in self.links:
+            link_str += f"{link.num} "
+        out_str = f"NUM : {self.num} \nLABEL : {self.label} \nPARENT : {parent_str} \nCHILDLEN : {child_str}\nLINKS : {link_str}\n"
+        return out_str
+        
 
     def is_ripe(self):
         if self.tag == 1:

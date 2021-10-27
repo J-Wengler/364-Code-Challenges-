@@ -3,9 +3,10 @@ class Node:
         self.children = [] # List of Nodes
         self.parent = None # Node
         self.num = num # number node name
-        self.label = "" # i.e. agctca
+        self.label = num # i.e. agctca
         self.sk = dict.fromkeys(['A', 'C', 'G', 'T']) # indexes are acgt
         self.tag = None
+        self.links = []
         self.distance_to_parent = 0  # The substitutions required to turn child to parent i.e. AGG->TGG=1
 
     def __repr__(self):

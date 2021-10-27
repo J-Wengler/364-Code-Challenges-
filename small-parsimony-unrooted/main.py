@@ -36,46 +36,64 @@ def get_min_key_value(node, k, character):
             min_key = key
     return min_key, min_value
 
-def add_root_to_unrooted_tree(T):
-    paired_node_one = None
-    paired_node_one_num = -1
-    paired_node_two = None
-    paired_node_two_num = -1
-    for node in T.T.values():
-        if len(node.children) == 3:
-            if paired_node_one is None:
-                paired_node_one = node
-                paired_node_one_num = node.num
+# def assign_family(parent_node, node):
+#     if node.label == "Root":
+#         return False
+
+def parse_new_tree(T, node):
+    if len(node.children) == 2:
+        for child in node.children:
+            parse_new_tree(T, child)
+    elif len(node.links) == 1:
+        return False
+    else:
+        parent_node = T.T[node.parent.num]
+        temp_children = []
+        for link in node.links:
+            if parent_node.num == link.num:
+                continue
             else:
-                paired_node_two = node
-                paired_node_two_num = node.num
-    root = Node(len(T.T.values()))
-    paired_node_one.remove_child(paired_node_two_num)
-    paired_node_two.remove_child(paired_node_one_num)
-    paired_node_one.parent = root
-    paired_node_two.parent = root
-    root.children.append(paired_node_one)
-    root.children.append(paired_node_two)
-    T.T[len(T.T.values())] = root
+                temp_children.append(link)
+
+        for child in temp_children:
+            node.children.append(child)
+            child.parent = node
+            parse_new_tree(T, child)
+                
+
+def add_root_to_unrooted_tree(T):
+    node_keys = T.T.keys()
+    node_one = T.T[list(node_keys)[0]]
+    node_two = node_one.links[0]
+    node_one.links.remove(node_two)
+    node_two.links.remove(node_one)
+    root = Node("Root")
+    root.children.append(node_one)
+    root.children.append(node_two)
+    T.T["Root"] = root
+    node_one.parent = root
+    node_two.parent = root
+    parse_new_tree(T, root)
     return T
 
-# def remove_root(T):
-#     root_node = None
-#     root_num = -1
-#     left_root_child = None
-#     right_root_child = None
-#     for node in T.T.values():
-#         if node.parent == None:
-#             root_node = node
-#             root_num = node.num
-#             left_root_child = node.children[0]
-#             right_root_child = node.children[1]
-#     del T.T[root_num]
-#     #left_root_child.parent = right_root_child
-#     #left_root_child.children.append(right_root_child)
-#     #right_root_child.parent = None
-#     #right_root_child.children.append(left_root_child)
-#     return T
+def remove_root(T):
+    root_node = None
+    root_num = -1
+    left_root_child = None
+    right_root_child = None
+    for n in T.T.keys():
+        node = T.T[n]
+        if node.parent == None:
+            root_node = node
+            root_num = node.num
+            left_root_child = node.children[0]
+            right_root_child = node.children[1]
+    del T.T[root_num]
+    left_root_child.parent = None
+    left_root_child.children.append(right_root_child)
+    right_root_child.parent = left_root_child
+    #right_root_child.children.append(left_root_child)
+    return T
 
 
 
@@ -118,8 +136,9 @@ def small_parsimony(T, character):
     # iterate over each character in the genome
     # so we can operate on the tree as if the 
     # nodes were labeled with just one character
-    for i in range(len(T.T[0].label)):
-        for j in range(len(T.T)):
+    for i in range(len(T.T[next(iter(T.T))].label)):
+        print(i)
+        for j in T.T.keys():
             T.T[j].tag = 0
             if len(T.T[j].children) == 0:
                 T.T[j].tag = 1
@@ -157,8 +176,8 @@ def save_output(output_file_path, T):
         out_file.write(out_string)
 
 
-input_file_path = "/Users/jameswengler/BIO 364/364-Code-Challenges-/small-parsimony/input.txt"
-output_file_path = "/Users/jameswengler/BIO 364/364-Code-Challenges-/small-parsimony/output.txt"
+input_file_path = "/Users/jameswengler/BIO 364/364-Code-Challenges-/small-parsimony-unrooted/input.txt"
+output_file_path = "/Users/jameswengler/BIO 364/364-Code-Challenges-/small-parsimony-unrooted/output.txt"
 character = ['A', 'C', 'G', 'T']
 
 # T = buildtreefromfile(input_file_path)
@@ -172,12 +191,10 @@ character = ['A', 'C', 'G', 'T']
 
 T = build_unrooted_tree(input_file_path)
 T = add_root_to_unrooted_tree(T)
-
-
-print(T)
-
-#small_parsimony(T, character)
-
-
-#save_output(output_file_path, T)
+#print(T)
+small_parsimony(T, character)
+#print("---------------------------\n")
+T = remove_root(T)
+#print(T)
+save_output(output_file_path, T)
 
