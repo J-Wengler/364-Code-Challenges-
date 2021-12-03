@@ -23,6 +23,8 @@ def make_root(T, left, right):
 
     left.parent = root
     right.parent = root
+    #left.links.append(root)
+    #right.links.append(root)
 
     parse_from_root(left)
     parse_from_root(right)
@@ -43,6 +45,22 @@ def get_node(string_node, T):
     T[string_node] = new_node
     return new_node
 
+def build_simple_tree_from_file(input_file_path):
+    T = {}
+    with open(input_file_path, 'r+') as input_file:
+        n = input_file.readline()
+        for line in input_file.readlines():
+            line = line.rstrip().split("->")
+            left = get_node(line[0], T)
+            right = get_node(line[1], T)
+            if left not in right.links:
+                right.links.append(left)
+            if right not in left.links:
+                left.links.append(right)
+    # Use last two adjacent nodes to insert root
+    root = make_root(T, left, right)
+    return Tree(T, root)
+
 # Parse through the data and create a unrooted tree, then root and parse it
 def build_simple_tree(input_file_path):
     T = {}
@@ -52,8 +70,10 @@ def build_simple_tree(input_file_path):
             line = line.rstrip().split("->")
             left = get_node(line[0], T)
             right = get_node(line[1], T)
-
-            left.links.append(right)
-    # Use last two adjacent nodes to insert root
-    root = make_root(T, left, right)
-    return Tree(T, root)    
+            if left not in right.links:
+                right.links.append(left)
+            if right not in left.links:
+                left.links.append(right)
+            #right.links.append(left)
+    #root = make_root(T, left, right)
+    return Tree(T)    
